@@ -1,4 +1,3 @@
-version: "3.4"
 
 services:
   api:
@@ -56,7 +55,7 @@ services:
       - saleor-redis:/data
 
   worker:
-    image: ghcr.io/saleor/saleor:3.20
+    image: gcr.io/isec6000-21457140/saleor-worker:2.0
     command: celery -A saleor --app=saleor.celeryconf:app worker --loglevel=info -B
     restart: unless-stopped
     networks:
@@ -72,7 +71,7 @@ services:
       - saleor-media:/app/media
 
   jaeger:
-    image: jaegertracing/all-in-one
+    image: jaegertracing/all-in-one:latest
     ports:
       - "5775:5775/udp"
       - "6831:6831/udp"
@@ -85,11 +84,11 @@ services:
     networks:
       - saleor-backend-tier
     volumes:
-      - type: tmpfs
-        target: /tmp
+      - jaeger-data:/var/lib/jaeger
 
   mailpit:
-    image: axllent/mailpit
+    image: axllent/mailpit:latest
+#    image: gcr.io/isec6000-21457140/saleor-mailpit:2.0 
     ports:
       - 1025:1025 # smtp server
       - 8025:8025 # web ui. Visit http://localhost:8025/ to check emails
@@ -103,6 +102,9 @@ volumes:
   saleor-redis:
     driver: local
   saleor-media:
+    driver: local
+  jaeger-data:
+    driver: local
 
 networks:
   saleor-backend-tier:
